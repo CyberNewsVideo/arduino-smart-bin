@@ -1,1 +1,56 @@
-code will be here
+#include <Servo.h>
+#define echoPin 10 // attach pin D2 Arduino to pin Echo of HC-SR04
+#define trigPin 9 //attach pin D3 Arduino to pin Trig of HC-SR04
+#define servoPin 5
+Servo myservo;
+long duration;
+int pos = 0;
+int distance = 3000;
+boolean printDistance = false;
+int triggerDistance = 30;
+int delayBetweenSteps = 3000;
+void setup() {
+  myservo.attach(servoPin);
+  myservo.write(0);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  if (printDistance)
+  {
+    Serial.begin(9600);
+    Serial.println("Ultrasonic Sensor HC-SR04 Test");
+    Serial.println("with Arduino UNO R3");
+  }
+}
+void loop() {
+  measureDistance();
+  if (distance < triggerDistance)
+  {
+    moveServo();
+  }
+}
+void moveServo(){
+  for (pos = 0; pos <= 180; pos += 1)
+  {
+    myservo.write(pos);   
+    delay(15);            
+  }
+  delay(delayBetweenSteps);
+  for (pos = 180; pos >= 0; pos -= 1) {
+    myservo.write(pos);              // tell servo to go to position in variable 'pos'
+    delay(15);                       // waits 15ms for the servo to reach the position
+  }
+}
+int measureDistance(){
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  distance = pulseIn(echoPin, HIGH) * 0.034 / 2;
+  if (printDistance)
+  {
+    Serial.print("Distance: ");
+    Serial.print(distance);
+    Serial.println(" cm");
+  }
+}
